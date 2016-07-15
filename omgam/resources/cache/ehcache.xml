@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+	<diskStore path="java.io.tmpdir/pms" />
+
+
+	<!-- DefaultCache setting. -->
+	 <defaultCache maxElementsInMemory="10000" eternal="false"
+        timeToIdleSeconds="3600" timeToLiveSeconds="3600"
+        overflowToDisk="true" diskPersistent="false"
+        diskExpiryThreadIntervalSeconds="120"
+        memoryStoreEvictionPolicy="LRU" />
+
+	<!-- Special objects setting. -->
+	
+	<cache name="com.omg.evn.entity.system.Sysgroup" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.SysMyspace" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.SysRole" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.Sysuser" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.UserToArea" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.UserToDepart" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.UserToGroup" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.UserToRole" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.ModuleToPrivilege" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	<cache name="com.omg.evn.entity.system.GroupToPrivilege" maxElementsInMemory="1000"
+		memoryStoreEvictionPolicy="LRU" eternal="false" 
+		diskPersistent="false" overflowToDisk="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" 
+		/>
+	
+
+</ehcache>

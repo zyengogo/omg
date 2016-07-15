@@ -1,0 +1,18 @@
+package com.cpt.xbase;
+
+import java.math.BigDecimal;
+
+
+/**
+ * @Description:常量类
+ * @author:seasky
+ * @date : 2014-2-14 下午02:45:07
+ * @modUser：
+ * @modDate：
+ */
+public class XbaseConstants {
+	
+	public static final String ACTIONEXCEPTION="*******控制层异常*******\n";  //
+
+  
+}

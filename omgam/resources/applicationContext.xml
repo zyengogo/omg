@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+	http://www.springframework.org/schema/jee 
+	http://www.springframework.org/schema/jee/spring-jee-2.5.xsd 
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-lazy-init="true">
+	<description>DAO配置</description>
+
+	<!-- 定义受环境影响易变的变量 ,v-->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<!-- 标准配置 -->
+				<value>classpath*:/application.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
+	
+	<!-- 定义使用C3P0连接池的数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+			<property name="driverClass" value="${jdbc.driver}"></property>
+			<property name="jdbcUrl" value="${jdbc.url}"></property>
+			<property name="user" value="${jdbc.username}"></property>
+			<property name="password" value="${jdbc.password}"></property>
+			
+			<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 --> 
+			<property name="acquireIncrement" value="3"></property> 
+			<!--定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 --> 
+		    <property name="acquireRetryAttempts" value="30"></property>
+		    <!--两次连接中间隔时间，单位毫秒。Default: 1000 --> 
+	        <property name="acquireRetryDelay" value="1000"></property> 
+			<!--连接关闭时默认将所有未提交的操作回滚。Default: false --> 
+			<property name="autoCommitOnClose" value="false"></property> 
+			<!--每60秒检查所有连接池中的空闲连接。Default: 0 --> 
+			<property name="idleConnectionTestPeriod" value="60"></property> 
+			<!--初始化时获取三个连接，取值应在minPoolSize与maxPoolSize之间。Default: 5 --> 
+			<property name="initialPoolSize" value="5"></property> 
+			<!--连接池中保留的最大连接数。Default: 20 --> 
+			<property name="maxPoolSize" value="100"></property> 
+			<!--连接池中保留的最小连接数。Default: 5 --> 
+			<property name="minPoolSize" value="5"></property>
+			<property name="maxStatements" value="0"></property>
+		</bean>
+		
+		
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+	<context:component-scan base-package="com.omg.xbase.hibernate.impl" />  
+	<context:component-scan base-package="com.omg.evn" >
+      <context:include-filter type="regex" expression=".service.*"/>
+      <context:include-filter type="regex" expression=".dao.*"/>
+      <context:include-filter type="regex" expression=".entity.*"/>
+   </context:component-scan>
+	
+	<!-- Hibernate配置 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">${hibernate.ehcache_config_file}</prop>
+			</props>
+		</property>
+	<property name="packagesToScan" value="com.omg.evn.entity.*" /> 
+	
+	</bean>
+
+	<!-- 事务管理器配置,单数据源事务 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- 使用annotation全注解方式定义事务 -->
+	<!-- <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/> -->
+    	 
+	<!-- 装配HibernateTemplate实例 -->
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<constructor-arg ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 使用拦截器 来配置事务 -->
+    <bean id="transactionInterceptor"
+        class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="transactionAttributes">
+            <props>
+           	    <!-- 所有以browse、list、load、get及 is开头的业务逻辑方法均不需要事务控制且只读 -->
+                <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="query*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="browse*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="list*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="is*">PROPAGATION_REQUIRED,readOnly</prop>
+                <prop key="save*">PROPAGATION_REQUIRED</prop>
+                <prop key="del*">PROPAGATION_REQUIRED</prop>
+                
+                <!-- 设置所有方法均进行事务控制，如果当前没有事务，则新建一个事务 -->
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+				
+            </props>
+        </property>
+    </bean>
+    
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">  
+        <property name="beanNames">  
+            <list>  
+                <value>*Service</value>
+            </list>  
+        </property>  
+        <property name="interceptorNames">  
+            <list>  
+                <value>transactionInterceptor</value>  
+            </list>  
+        </property>
+        <property name="proxyTargetClass"> 
+          <value>true</value> 
+        </property>   
+    </bean>
+</beans>

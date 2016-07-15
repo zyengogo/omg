@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		XCDMS基础日志输出模块,要使用这个模块,需要把JAR包放入CLASSPAHT
+		如果要使用spring来管理,需要在spring的主配置文件中导入这个xml
+		如果脱离Spring使用,就直接使用LogFactory.getlogger()就可以了,系统会自动判断是使用LOG4J还是其他
+		如果要手动指定 使用LogFactory.getLogger(Class clazz)
+	-->
+	<!-- 本模块所依赖的包:commons-logging.jar  log4j.jar -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+	default-lazy-init="true">
+	<!-- 以下几种,是提供给logger模块自己使用的,外面系统不应该调用 -->
+	<!-- 注册systemLOG 使用的是prototype的scope -->
+	<bean id="systemLog" class="com.omg.xbase.xlog.impl.SystemLog"
+		scope="prototype" />
+
+	<!-- 注册log4jLOG  使用的是prototype的scope-->
+	<bean id="log4jLog" class="com.omg.xbase.xlog.impl.Log4jLog"
+		scope="prototype" />
+
+	<!-- 注册noLOG  使用的是单例 -->
+	<bean id="noLog" class="com.omg.xbase.xlog.impl.NoLog" />
+
+
+	<!-- 以下几种,是提供为外部系统调用,如果外部系统需要logger,只需要IOC这几个bean,就可以了 -->
+	<!-- 注册对外的logger组件, 使用的是prototype的scope -->
+	<bean id="system_publiclogger" class="com.omg.xbase.xlog.LogProxy"
+		scope="prototype">
+		<property name="logger" ref="systemLog" />
+	</bean>
+
+	<!-- 注册对外的logger组件, 使用的是prototype的scope -->
+	<bean id="log4j_publiclogger" class="com.omg.xbase.xlog.LogProxy"
+		scope="prototype">
+		<property name="logger" ref="log4jLog" />
+	</bean>
+
+	<!-- 注册对外的logger组件, 使用的是prototype的scope -->
+	<bean id="noLog_publiclogger" class="com.omg.xbase.xlog.LogProxy"
+		scope="prototype">
+		<property name="logger" ref="noLog" />
+	</bean>
+
+
+	<!-- 以下部分是Spring AOP来处理logger的Bean -->
+	<bean id="eventLogger_console_publiclogger" class="com.omg.xbase.xlog.spring.EventLogger">
+		<property name="log" ref="system_publiclogger" />
+	</bean>
+
+	<!-- 以下部分是Spring AOP来处理logger的Bean -->
+	<bean id="eventLogger_log4j_publiclogger" class="com.omg.xbase.xlog.spring.EventLogger">
+		<property name="log" ref="log4j_publiclogger" />
+	</bean>
+
+	<!-- 以下部分是Spring AOP来处理logger的Bean -->
+	<bean id="eventLogger_nolog_publiclogger" class="com.omg.xbase.xlog.spring.EventLogger">
+		<property name="log" ref="noLog_publiclogger" />
+	</bean>
+
+</beans>
